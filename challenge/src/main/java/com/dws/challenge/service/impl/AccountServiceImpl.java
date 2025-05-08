@@ -10,12 +10,16 @@ import com.dws.challenge.domain.Account;
 import com.dws.challenge.dto.TransferRequest;
 import com.dws.challenge.repositories.AccountRepository;
 import com.dws.challenge.service.AccountService;
+import com.dws.challenge.service.NotificationService;
 
 @Service
 public class AccountServiceImpl implements AccountService {
 
 	@Autowired
 	private AccountRepository accRepo;
+	
+	@Autowired
+	NotificationService notificationService;
 
 	@Override
 	public void transfer(TransferRequest request) {
@@ -38,6 +42,9 @@ public class AccountServiceImpl implements AccountService {
 
         accRepo.save(from);
         accRepo.save(to);
+        
+        notificationService.sendNotification(from.getId(), "Your account has been debited by " + request.getAmount() + " for the transfer.");
+        notificationService.sendNotification(to.getId(), "Your account has been credited with " + request.getAmount() + " from the transfer.");
 
 	}
 
