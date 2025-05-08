@@ -12,7 +12,10 @@ import com.dws.challenge.repositories.AccountRepository;
 import com.dws.challenge.service.AccountService;
 import com.dws.challenge.service.NotificationService;
 
+import jakarta.transaction.Transactional;
+
 @Service
+@Transactional
 public class AccountServiceImpl implements AccountService {
 
 	@Autowired
@@ -28,10 +31,9 @@ public class AccountServiceImpl implements AccountService {
 			throw new IllegalArgumentException("Transfer amount must be positive");
 		}
 
-		Account from = accRepo.findById(request.getAccFrom())
-				.orElseThrow(() -> new RuntimeException("Sender account not found"));
-		Account to = accRepo.findById(request.getAccTo())
-				.orElseThrow(() -> new RuntimeException("Receiver account not found"));
+		Account from = accRepo.findByIdForUpdate(request.getAccFrom());
+		
+		Account to = accRepo.findByIdForUpdate(request.getAccTo());
 
 		if (from.getBalance().compareTo(request.getAmount()) < 0) {
 			throw new IllegalStateException("Insufficient funds in sender account");
